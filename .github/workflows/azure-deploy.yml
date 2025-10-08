@@ -37,7 +37,7 @@ jobs:
       working-directory: ./
 
     - name: Publish application
-      run: dotnet publish library-system/library-system.sln --configuration Release --output ./publish --no-build
+      run: dotnet publish library-system/src/Api/Api.csproj --configuration Release --output ./publish
       working-directory: ./
 
     - name: Azure Login
@@ -141,22 +141,14 @@ jobs:
           --name ${{ env.WEB_APP_NAME }} \
           --settings \
             ASPNETCORE_ENVIRONMENT="Production" \
-            WEBSITE_RUN_FROM_PACKAGE="0" \
-            SCM_DO_BUILD_DURING_DEPLOYMENT="false" \
           --output none
         echo "✓ App Settings configured"
-
-    - name: Create deployment package
-      run: |
-        cd publish
-        zip -r ../app.zip .
-        cd ..
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
       with:
         app-name: ${{ env.WEB_APP_NAME }}
-        package: ./app.zip
+        package: ./publish
 
     - name: Restart Web App
       run: |
