@@ -37,7 +37,10 @@ namespace library_system
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
-                x.IncludeXmlComments(xmlPath);
+                if (File.Exists(xmlPath))
+                {
+                    x.IncludeXmlComments(xmlPath);
+                }
             });
 
             builder.Services.AddInfrastructure(builder.Configuration);
