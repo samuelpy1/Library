@@ -1,0 +1,183 @@
+name: Deploy Library System to Azure
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  RESOURCE_GROUP: 'rg-library-fiap-557884'
+  LOCATION: 'brazilsouth'
+  DB_SERVER_NAME: 'sql-library-557884'
+  DB_NAME: 'librarydb'
+  APP_SERVICE_PLAN: 'asp-library-fiap-557884'
+  WEB_APP_NAME: 'webapp-library-557884'
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore library-system/library-system.sln
+      working-directory: ./
+
+    - name: Build application
+      run: dotnet build library-system/library-system.sln --configuration Release --no-restore
+      working-directory: ./
+
+    - name: Publish application
+      run: dotnet publish library-system/library-system.sln --configuration Release --output ./publish --no-build
+      working-directory: ./
+
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Register Resource Providers
+      run: |
+        az provider register --namespace Microsoft.Sql --wait
+        az provider register --namespace Microsoft.Web --wait
+        az provider register --namespace Microsoft.Storage --wait
+        echo "✓ Resource Providers registered"
+
+    - name: Create Resource Group
+      run: |
+        az group create \
+          --name ${{ env.RESOURCE_GROUP }} \
+          --location ${{ env.LOCATION }} \
+          --output none
+        echo "✓ Resource Group created"
+
+    - name: Create SQL Server
+      run: |
+        az sql server create \
+          --name ${{ env.DB_SERVER_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --location ${{ env.LOCATION }} \
+          --admin-user ${{ secrets.DB_ADMIN_USER }} \
+          --admin-password ${{ secrets.DB_ADMIN_PASSWORD }} \
+          --output none
+        echo "✓ SQL Server created"
+
+    - name: Configure SQL Server Firewall
+      run: |
+        az sql server firewall-rule create \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --server ${{ env.DB_SERVER_NAME }} \
+          --name AllowAzureServices \
+          --start-ip-address 0.0.0.0 \
+          --end-ip-address 0.0.0.0 \
+          --output none
+
+        az sql server firewall-rule create \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --server ${{ env.DB_SERVER_NAME }} \
+          --name AllowAll \
+          --start-ip-address 0.0.0.0 \
+          --end-ip-address 255.255.255.255 \
+          --output none
+        echo "✓ Firewall configured"
+
+    - name: Create SQL Database
+      run: |
+        az sql db create \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --server ${{ env.DB_SERVER_NAME }} \
+          --name ${{ env.DB_NAME }} \
+          --service-objective S0 \
+          --backup-storage-redundancy Local \
+          --output none
+        echo "✓ SQL Database created"
+
+    - name: Create App Service Plan
+      run: |
+        az appservice plan create \
+          --name ${{ env.APP_SERVICE_PLAN }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --location ${{ env.LOCATION }} \
+          --sku B1 \
+          --is-linux \
+          --output none
+        echo "✓ App Service Plan created"
+
+    - name: Create Web App
+      run: |
+        az webapp create \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --plan ${{ env.APP_SERVICE_PLAN }} \
+          --name ${{ env.WEB_APP_NAME }} \
+          --runtime "DOTNETCORE:8.0" \
+          --output none
+        echo "✓ Web App created"
+
+    - name: Configure Connection String
+      run: |
+        CONNECTION_STRING="Server=tcp:${{ env.DB_SERVER_NAME }}.database.windows.net,1433;Initial Catalog=${{ env.DB_NAME }};Persist Security Info=False;User ID=${{ secrets.DB_ADMIN_USER }};Password=${{ secrets.DB_ADMIN_PASSWORD }};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+
+        az webapp config connection-string set \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.WEB_APP_NAME }} \
+          --settings DefaultConnection="$CONNECTION_STRING" \
+          --connection-string-type SQLAzure \
+          --output none
+        echo "✓ Connection String configured"
+
+    - name: Configure App Settings
+      run: |
+        az webapp config appsettings set \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.WEB_APP_NAME }} \
+          --settings \
+            ASPNETCORE_ENVIRONMENT="Production" \
+            WEBSITE_RUN_FROM_PACKAGE="0" \
+            SCM_DO_BUILD_DURING_DEPLOYMENT="false" \
+          --output none
+        echo "✓ App Settings configured"
+
+    - name: Create deployment package
+      run: |
+        cd publish
+        zip -r ../app.zip .
+        cd ..
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: ${{ env.WEB_APP_NAME }}
+        package: ./app.zip
+
+    - name: Restart Web App
+      run: |
+        az webapp restart \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.WEB_APP_NAME }} \
+          --output none
+        echo "✓ Web App restarted"
+
+    - name: Display deployment info
+      run: |
+        echo "======================================================"
+        echo "DEPLOY CONCLUÍDO COM SUCESSO!"
+        echo "======================================================"
+        echo "URL da Aplicação: https://${{ env.WEB_APP_NAME }}.azurewebsites.net"
+        echo "Servidor SQL: ${{ env.DB_SERVER_NAME }}.database.windows.net"
+        echo "Banco de Dados: ${{ env.DB_NAME }}"
+        echo ""
+        echo "Aguarde 2-3 minutos para a aplicação iniciar completamente."
+        echo "======================================================"
+
+    - name: Azure Logout
+      if: always()
+      run: az logout
