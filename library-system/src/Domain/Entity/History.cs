@@ -10,7 +10,7 @@ public class Loan
     public DateTime? ReturnDate { get; set; }
     public LoanStatus Status { get; set; }
     public decimal? LateFee { get; set; }
-    public string Notes { get; set; }
+    public string Notes { get; set; } = string.Empty;
 
     public Loan()
     {

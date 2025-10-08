@@ -35,8 +35,8 @@ namespace library_system.Api.Controllers
         /// <returns>Lista paginada de empréstimos</returns>
         /// <response code="200">Retorna a lista de empréstimos com sucesso</response>
         [HttpGet(Name = nameof(GetLoans))]
-        [ProducesResponseType(typeof(IEnumerable<LoanDTO>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<LoanDTO>>> GetLoans([FromQuery] PaginationParams paginationParams)
+        [ProducesResponseType(typeof(IEnumerable<HistoryDTO>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<HistoryDTO>>> GetLoans([FromQuery] PaginationParams paginationParams)
         {
             var pagedLoans = await _loanService.GetPagedLoansAsync(paginationParams);
 
@@ -70,9 +70,9 @@ namespace library_system.Api.Controllers
         /// <response code="200">Empréstimo encontrado com sucesso</response>
         /// <response code="404">Empréstimo não encontrado</response>
         [HttpGet("{id:guid}", Name = nameof(GetLoan))]
-        [ProducesResponseType(typeof(LoanDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HistoryDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LoanDTO>> GetLoan(Guid id)
+        public async Task<ActionResult<HistoryDTO>> GetLoan(Guid id)
         {
             var loan = await _loanService.GetLoanByIdAsync(id);
             if (loan == null)
@@ -100,7 +100,7 @@ namespace library_system.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PutLoan(Guid id, LoanDTO loanDto)
+        public async Task<IActionResult> PutLoan(Guid id, HistoryDTO loanDto)
         {
             if (id != loanDto.LoanId)
             {
@@ -127,9 +127,9 @@ namespace library_system.Api.Controllers
         /// <response code="201">Empréstimo criado com sucesso</response>
         /// <response code="400">Dados inválidos fornecidos</response>
         [HttpPost(Name = nameof(PostLoan))]
-        [ProducesResponseType(typeof(LoanDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(HistoryDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<LoanDTO>> PostLoan(LoanDTO loanDto)
+        public async Task<ActionResult<HistoryDTO>> PostLoan(HistoryDTO loanDto)
         {
             var createdLoan = await _loanService.CreateLoanAsync(loanDto);
 

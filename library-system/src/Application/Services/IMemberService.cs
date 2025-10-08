@@ -6,11 +6,11 @@ namespace library_system.Application.Services
 {
     public interface IMemberService
     {
-        Task<IEnumerable<MemberDTO>> GetAllMembersAsync();
-        Task<MemberDTO> GetMemberByIdAsync(Guid id);
-        Task<MemberDTO> CreateMemberAsync(MemberDTO memberDto);
-        Task UpdateMemberAsync(Guid id, MemberDTO memberDto);
+        Task<IEnumerable<UserDTO>> GetAllMembersAsync();
+        Task<UserDTO> GetMemberByIdAsync(Guid id);
+        Task<UserDTO> CreateMemberAsync(UserDTO memberDto);
+        Task UpdateMemberAsync(Guid id, UserDTO memberDto);
         Task DeleteMemberAsync(Guid id);
-        Task<PagedListDto<MemberDTO>> GetPagedMembersAsync(PaginationParams paginationParams);
+        Task<PagedListDto<UserDTO>> GetPagedMembersAsync(PaginationParams paginationParams);
     }
 }

@@ -11,7 +11,7 @@ namespace library_system.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<ChallengeMotoConnectContext>(options =>
+            services.AddDbContext<LibrarySystemContext>(options =>
             {
                 options.UseOracle(configuration.GetConnectionString("Oracle"));
             });

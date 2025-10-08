@@ -35,8 +35,8 @@ namespace library_system.Api.Controllers
         /// <returns>Lista paginada de membros</returns>
         /// <response code="200">Retorna a lista de membros com sucesso</response>
         [HttpGet(Name = nameof(GetMembers))]
-        [ProducesResponseType(typeof(IEnumerable<MemberDTO>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<MemberDTO>>> GetMembers([FromQuery] PaginationParams paginationParams)
+        [ProducesResponseType(typeof(IEnumerable<UserDTO>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetMembers([FromQuery] PaginationParams paginationParams)
         {
             var pagedMembers = await _memberService.GetPagedMembersAsync(paginationParams);
 
@@ -70,9 +70,9 @@ namespace library_system.Api.Controllers
         /// <response code="200">Membro encontrado com sucesso</response>
         /// <response code="404">Membro não encontrado</response>
         [HttpGet("{id:guid}", Name = nameof(GetMember))]
-        [ProducesResponseType(typeof(MemberDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<MemberDTO>> GetMember(Guid id)
+        public async Task<ActionResult<UserDTO>> GetMember(Guid id)
         {
             var member = await _memberService.GetMemberByIdAsync(id);
 
@@ -101,7 +101,7 @@ namespace library_system.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PutMember(Guid id, MemberDTO memberDto)
+        public async Task<IActionResult> PutMember(Guid id, UserDTO memberDto)
         {
             if (id != memberDto.MemberId)
             {
@@ -128,9 +128,9 @@ namespace library_system.Api.Controllers
         /// <response code="201">Membro criado com sucesso</response>
         /// <response code="400">Dados inválidos fornecidos</response>
         [HttpPost(Name = nameof(PostMember))]
-        [ProducesResponseType(typeof(MemberDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(UserDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<MemberDTO>> PostMember(MemberDTO memberDto)
+        public async Task<ActionResult<UserDTO>> PostMember(UserDTO memberDto)
         {
             var createdMember = await _memberService.CreateMemberAsync(memberDto);
 

@@ -5,9 +5,9 @@ using System.IO;
 
 namespace library_system.Infrastructure.Persistence.Context
 {
-    public class ChallengeMotoConnectContextFactory : IDesignTimeDbContextFactory<ChallengeMotoConnectContext>
+    public class LibrarySystemContextFactory : IDesignTimeDbContextFactory<LibrarySystemContext>
     {
-        public ChallengeMotoConnectContext CreateDbContext(string[] args)
+        public LibrarySystemContext CreateDbContext(string[] args)
         {
             var environmentName = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
@@ -18,12 +18,12 @@ namespace library_system.Infrastructure.Persistence.Context
                 .AddEnvironmentVariables()
                 .Build();
 
-            var builder = new DbContextOptionsBuilder<ChallengeMotoConnectContext>();
+            var builder = new DbContextOptionsBuilder<LibrarySystemContext>();
             var connectionString = configuration.GetConnectionString("Oracle");
 
             builder.UseOracle(connectionString);
 
-            return new ChallengeMotoConnectContext(builder.Options);
+            return new LibrarySystemContext(builder.Options);
         }
     }
 }

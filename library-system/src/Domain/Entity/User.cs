@@ -5,10 +5,10 @@ namespace library_system.Domain.Entity
     public class Member
     {
         public Guid MemberId { get; set; }
-        public string Name { get; set; }
-        public Email Email { get; private set; }
-        public Password Password { get; private set; }
-        public string Phone { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public Email Email { get; private set; } = null!;
+        public Password Password { get; private set; } = null!;
+        public string Phone { get; set; } = string.Empty;
         public DateTime RegistrationDate { get; set; }
         public bool IsActive { get; set; }
 

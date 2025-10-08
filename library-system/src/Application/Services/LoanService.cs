@@ -18,10 +18,10 @@ namespace library_system.Application.Services
             _loanRepository = loanRepository;
         }
 
-        public async Task<IEnumerable<LoanDTO>> GetAllLoansAsync()
+        public async Task<IEnumerable<HistoryDTO>> GetAllLoansAsync()
         {
             var loans = await _loanRepository.GetAllAsync();
-            return loans.Select(l => new LoanDTO
+            return loans.Select(l => new HistoryDTO
             {
                 LoanId = l.LoanId,
                 BookId = l.BookId,
@@ -35,12 +35,12 @@ namespace library_system.Application.Services
             });
         }
 
-        public async Task<LoanDTO> GetLoanByIdAsync(Guid id)
+        public async Task<HistoryDTO> GetLoanByIdAsync(Guid id)
         {
             var loan = await _loanRepository.GetByIdAsync(id);
             if (loan == null) return null;
 
-            return new LoanDTO
+            return new HistoryDTO
             {
                 LoanId = loan.LoanId,
                 BookId = loan.BookId,
@@ -54,7 +54,7 @@ namespace library_system.Application.Services
             };
         }
 
-        public async Task<LoanDTO> CreateLoanAsync(LoanDTO loanDto)
+        public async Task<HistoryDTO> CreateLoanAsync(HistoryDTO loanDto)
         {
             var loan = new Loan
             {
@@ -70,7 +70,7 @@ namespace library_system.Application.Services
             };
             await _loanRepository.AddAsync(loan);
 
-            return new LoanDTO
+            return new HistoryDTO
             {
                 LoanId = loan.LoanId,
                 BookId = loan.BookId,
@@ -84,7 +84,7 @@ namespace library_system.Application.Services
             };
         }
 
-        public async Task UpdateLoanAsync(Guid id, LoanDTO loanDto)
+        public async Task UpdateLoanAsync(Guid id, HistoryDTO loanDto)
         {
             var loan = await _loanRepository.GetByIdAsync(id);
             if (loan == null) throw new KeyNotFoundException("Loan not found.");
@@ -109,12 +109,12 @@ namespace library_system.Application.Services
             await _loanRepository.DeleteAsync(loan.LoanId);
         }
 
-        public async Task<PagedListDto<LoanDTO>> GetPagedLoansAsync(PaginationParams paginationParams)
+        public async Task<PagedListDto<HistoryDTO>> GetPagedLoansAsync(PaginationParams paginationParams)
         {
             var loans = _loanRepository.GetAllAsQueryable();
             var pagedLoans = PagedListDto<Loan>.ToPagedList(loans, paginationParams.PageNumber, paginationParams.PageSize);
 
-            var loanDtos = pagedLoans.Items.Select(l => new LoanDTO
+            var loanDtos = pagedLoans.Items.Select(l => new HistoryDTO
             {
                 LoanId = l.LoanId,
                 BookId = l.BookId,
@@ -127,7 +127,7 @@ namespace library_system.Application.Services
                 Notes = l.Notes
             }).ToList();
 
-            return new PagedListDto<LoanDTO>(loanDtos, pagedLoans.TotalCount, pagedLoans.CurrentPage, pagedLoans.PageSize);
+            return new PagedListDto<HistoryDTO>(loanDtos, pagedLoans.TotalCount, pagedLoans.CurrentPage, pagedLoans.PageSize);
         }
     }
 }

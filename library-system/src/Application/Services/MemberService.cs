@@ -15,10 +15,10 @@ namespace library_system.Application.Services
             _memberRepository = memberRepository;
         }
 
-        public async Task<IEnumerable<MemberDTO>> GetAllMembersAsync()
+        public async Task<IEnumerable<UserDTO>> GetAllMembersAsync()
         {
             var members = await _memberRepository.GetAllAsync();
-            return members.Select(m => new MemberDTO
+            return members.Select(m => new UserDTO
             {
                 MemberId = m.MemberId,
                 Name = m.Name,
@@ -30,12 +30,12 @@ namespace library_system.Application.Services
             });
         }
 
-        public async Task<MemberDTO> GetMemberByIdAsync(Guid id)
+        public async Task<UserDTO> GetMemberByIdAsync(Guid id)
         {
             var member = await _memberRepository.GetByIdAsync(id);
             if (member == null) return null;
 
-            return new MemberDTO
+            return new UserDTO
             {
                 MemberId = member.MemberId,
                 Name = member.Name,
@@ -47,7 +47,7 @@ namespace library_system.Application.Services
             };
         }
 
-        public async Task<MemberDTO> CreateMemberAsync(MemberDTO memberDto)
+        public async Task<UserDTO> CreateMemberAsync(UserDTO memberDto)
         {
             var member = new Member(
                 Guid.NewGuid(),
@@ -58,7 +58,7 @@ namespace library_system.Application.Services
             );
             await _memberRepository.AddAsync(member);
 
-            return new MemberDTO
+            return new UserDTO
             {
                 MemberId = member.MemberId,
                 Name = member.Name,
@@ -70,7 +70,7 @@ namespace library_system.Application.Services
             };
         }
 
-        public async Task UpdateMemberAsync(Guid id, MemberDTO memberDto)
+        public async Task UpdateMemberAsync(Guid id, UserDTO memberDto)
         {
             var member = await _memberRepository.GetByIdAsync(id);
             if (member == null) throw new KeyNotFoundException("Member not found.");
@@ -92,12 +92,12 @@ namespace library_system.Application.Services
             await _memberRepository.DeleteAsync(member.MemberId);
         }
 
-        public async Task<PagedListDto<MemberDTO>> GetPagedMembersAsync(PaginationParams paginationParams)
+        public async Task<PagedListDto<UserDTO>> GetPagedMembersAsync(PaginationParams paginationParams)
         {
             var members = _memberRepository.GetAllAsQueryable();
             var pagedMembers = PagedListDto<Member>.ToPagedList(members, paginationParams.PageNumber, paginationParams.PageSize);
 
-            var memberDtos = pagedMembers.Items.Select(m => new MemberDTO
+            var memberDtos = pagedMembers.Items.Select(m => new UserDTO
             {
                 MemberId = m.MemberId,
                 Name = m.Name,
@@ -108,7 +108,7 @@ namespace library_system.Application.Services
                 IsActive = m.IsActive
             }).ToList();
 
-            return new PagedListDto<MemberDTO>(memberDtos, pagedMembers.TotalCount, pagedMembers.CurrentPage, pagedMembers.PageSize);
+            return new PagedListDto<UserDTO>(memberDtos, pagedMembers.TotalCount, pagedMembers.CurrentPage, pagedMembers.PageSize);
         }
     }
 }

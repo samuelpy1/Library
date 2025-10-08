@@ -8,9 +8,9 @@ namespace library_system.Application.Services
 {
     public class UserService : IUserService
     {
-        private readonly IRepository<User> _userRepository;
+        private readonly IRepository<Member> _userRepository;
 
-        public UserService(IRepository<User> userRepository)
+        public UserService(IRepository<Member> userRepository)
         {
             _userRepository = userRepository;
         }
@@ -20,10 +20,13 @@ namespace library_system.Application.Services
             var users = await _userRepository.GetAllAsync();
             return users.Select(u => new UserDTO
             {
-                UserID = u.UserID,
+                MemberId = u.MemberId,
+                Name = u.Name,
                 Email = u.Email.Address,
                 Password = u.Password.Value,
-                Type = (int)u.Type
+                Phone = u.Phone,
+                RegistrationDate = u.RegistrationDate,
+                IsActive = u.IsActive
             });
         }
 
@@ -34,16 +37,25 @@ namespace library_system.Application.Services
 
             return new UserDTO
             {
-                UserID = user.UserID,
+                MemberId = user.MemberId,
+                Name = user.Name,
                 Email = user.Email.Address,
                 Password = user.Password.Value,
-                Type = (int)user.Type
+                Phone = user.Phone,
+                RegistrationDate = user.RegistrationDate,
+                IsActive = user.IsActive
             };
         }
 
         public async Task<UserDTO> CreateUserAsync(UserDTO userDto)
         {
-            var user = new User(Guid.NewGuid(), new Email(userDto.Email), new Password(userDto.Password), (UserType)userDto.Type);
+            var user = new Member(
+                Guid.NewGuid(),
+                userDto.Name,
+                new Email(userDto.Email),
+                new Password(userDto.Password),
+                userDto.Phone
+            );
             await _userRepository.AddAsync(user);
             return userDto;
         }
@@ -53,9 +65,11 @@ namespace library_system.Application.Services
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null) throw new KeyNotFoundException("User not found.");
 
+            user.Name = userDto.Name;
             user.UpdateEmail(new Email(userDto.Email));
             user.UpdatePassword(new Password(userDto.Password));
-            user.Type = (UserType)userDto.Type;
+            user.Phone = userDto.Phone;
+            user.IsActive = userDto.IsActive;
 
             await _userRepository.UpdateAsync(user);
         }
@@ -65,20 +79,23 @@ namespace library_system.Application.Services
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null) throw new KeyNotFoundException("User not found.");
 
-            await _userRepository.DeleteAsync(user.UserID);
+            await _userRepository.DeleteAsync(user.MemberId);
         }
 
         public async Task<PagedListDto<UserDTO>> GetPagedUsersAsync(PaginationParams paginationParams)
         {
-            var users = _userRepository.GetAllAsQueryable(); // Assuming GetAllAsQueryable returns IQueryable<User>
-            var pagedUsers = PagedListDto<User>.ToPagedList(users, paginationParams.PageNumber, paginationParams.PageSize);
+            var users = _userRepository.GetAllAsQueryable();
+            var pagedUsers = PagedListDto<Member>.ToPagedList(users, paginationParams.PageNumber, paginationParams.PageSize);
 
             var userDtos = pagedUsers.Items.Select(u => new UserDTO
             {
-                UserID = u.UserID,
+                MemberId = u.MemberId,
+                Name = u.Name,
                 Email = u.Email.Address,
                 Password = u.Password.Value,
-                Type = (int)u.Type
+                Phone = u.Phone,
+                RegistrationDate = u.RegistrationDate,
+                IsActive = u.IsActive
             }).ToList();
 
             return new PagedListDto<UserDTO>(userDtos, pagedUsers.TotalCount, pagedUsers.CurrentPage, pagedUsers.PageSize);

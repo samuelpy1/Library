@@ -11,9 +11,9 @@ namespace library_system.Application.Services
 {
     public class HistoryService : IHistoryService
     {
-        private readonly IRepository<History> _historyRepository;
+        private readonly IRepository<Loan> _historyRepository;
 
-        public HistoryService(IRepository<History> historyRepository)
+        public HistoryService(IRepository<Loan> historyRepository)
         {
             _historyRepository = historyRepository;
         }
@@ -23,11 +23,15 @@ namespace library_system.Application.Services
             var histories = await _historyRepository.GetAllAsync();
             return histories.Select(h => new HistoryDTO
             {
-                MaintenanceHistoryID = h.MaintenanceHistoryID,
-                Description = h.Description,
-                MaintenanceDate = h.MaintenanceDate,
-                VehicleID = h.VehicleID,
-                UserID = h.UserID
+                LoanId = h.LoanId,
+                BookId = h.BookId,
+                MemberId = h.MemberId,
+                LoanDate = h.LoanDate,
+                DueDate = h.DueDate,
+                ReturnDate = h.ReturnDate,
+                Status = (int)h.Status,
+                LateFee = h.LateFee,
+                Notes = h.Notes
             });
         }
 
@@ -38,23 +42,31 @@ namespace library_system.Application.Services
 
             return new HistoryDTO
             {
-                MaintenanceHistoryID = history.MaintenanceHistoryID,
-                Description = history.Description,
-                MaintenanceDate = history.MaintenanceDate,
-                VehicleID = history.VehicleID,
-                UserID = history.UserID
+                LoanId = history.LoanId,
+                BookId = history.BookId,
+                MemberId = history.MemberId,
+                LoanDate = history.LoanDate,
+                DueDate = history.DueDate,
+                ReturnDate = history.ReturnDate,
+                Status = (int)history.Status,
+                LateFee = history.LateFee,
+                Notes = history.Notes
             };
         }
 
         public async Task<HistoryDTO> CreateHistoryAsync(HistoryDTO historyDto)
         {
-            var history = new History
+            var history = new Loan
             {
-                MaintenanceHistoryID = Guid.NewGuid(),
-                Description = historyDto.Description,
-                MaintenanceDate = historyDto.MaintenanceDate,
-                VehicleID = historyDto.VehicleID,
-                UserID = historyDto.UserID
+                LoanId = Guid.NewGuid(),
+                BookId = historyDto.BookId,
+                MemberId = historyDto.MemberId,
+                LoanDate = historyDto.LoanDate,
+                DueDate = historyDto.DueDate,
+                ReturnDate = historyDto.ReturnDate,
+                Status = (LoanStatus)historyDto.Status,
+                LateFee = historyDto.LateFee,
+                Notes = historyDto.Notes
             };
             await _historyRepository.AddAsync(history);
             return historyDto;
@@ -65,10 +77,14 @@ namespace library_system.Application.Services
             var history = await _historyRepository.GetByIdAsync(id);
             if (history == null) throw new KeyNotFoundException("History not found.");
 
-            history.Description = historyDto.Description;
-            history.MaintenanceDate = historyDto.MaintenanceDate;
-            history.VehicleID = historyDto.VehicleID;
-            history.UserID = historyDto.UserID;
+            history.BookId = historyDto.BookId;
+            history.MemberId = historyDto.MemberId;
+            history.LoanDate = historyDto.LoanDate;
+            history.DueDate = historyDto.DueDate;
+            history.ReturnDate = historyDto.ReturnDate;
+            history.Status = (LoanStatus)historyDto.Status;
+            history.LateFee = historyDto.LateFee;
+            history.Notes = historyDto.Notes;
 
             await _historyRepository.UpdateAsync(history);
         }
@@ -78,21 +94,25 @@ namespace library_system.Application.Services
             var history = await _historyRepository.GetByIdAsync(id);
             if (history == null) throw new KeyNotFoundException("History not found.");
 
-            await _historyRepository.DeleteAsync(history.MaintenanceHistoryID);
+            await _historyRepository.DeleteAsync(history.LoanId);
         }
 
         public async Task<PagedListDto<HistoryDTO>> GetPagedHistoriesAsync(PaginationParams paginationParams)
         {
             var histories = _historyRepository.GetAllAsQueryable();
-            var pagedHistories = PagedListDto<History>.ToPagedList(histories, paginationParams.PageNumber, paginationParams.PageSize);
+            var pagedHistories = PagedListDto<Loan>.ToPagedList(histories, paginationParams.PageNumber, paginationParams.PageSize);
 
             var historyDtos = pagedHistories.Items.Select(h => new HistoryDTO
             {
-                MaintenanceHistoryID = h.MaintenanceHistoryID,
-                Description = h.Description,
-                MaintenanceDate = h.MaintenanceDate,
-                VehicleID = h.VehicleID,
-                UserID = h.UserID
+                LoanId = h.LoanId,
+                BookId = h.BookId,
+                MemberId = h.MemberId,
+                LoanDate = h.LoanDate,
+                DueDate = h.DueDate,
+                ReturnDate = h.ReturnDate,
+                Status = (int)h.Status,
+                LateFee = h.LateFee,
+                Notes = h.Notes
             }).ToList();
 
             return new PagedListDto<HistoryDTO>(historyDtos, pagedHistories.TotalCount, pagedHistories.CurrentPage, pagedHistories.PageSize);

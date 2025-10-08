@@ -54,9 +54,9 @@ namespace library_system.Api.Controllers
 
             foreach (var history in pagedHistories.Items)
             {
-                history.Links.Add(new LinkDto(Url.Link(nameof(GetMaintenanceHistory), new { id = history.MaintenanceHistoryID }), "self", "GET"));
-                history.Links.Add(new LinkDto(Url.Link(nameof(PutMaintenanceHistory), new { id = history.MaintenanceHistoryID }), "update_history", "PUT"));
-                history.Links.Add(new LinkDto(Url.Link(nameof(DeleteMaintenanceHistory), new { id = history.MaintenanceHistoryID }), "delete_history", "DELETE"));
+                history.Links.Add(new LinkDto(Url.Link(nameof(GetMaintenanceHistory), new { id = history.LoanId }), "self", "GET"));
+                history.Links.Add(new LinkDto(Url.Link(nameof(PutMaintenanceHistory), new { id = history.LoanId }), "update_history", "PUT"));
+                history.Links.Add(new LinkDto(Url.Link(nameof(DeleteMaintenanceHistory), new { id = history.LoanId }), "delete_history", "DELETE"));
             }
 
             return Ok(pagedHistories.Items);
@@ -80,9 +80,9 @@ namespace library_system.Api.Controllers
                 return NotFound();
             }
 
-            history.Links.Add(new LinkDto(Url.Link(nameof(GetMaintenanceHistory), new { id = history.MaintenanceHistoryID }), "self", "GET"));
-            history.Links.Add(new LinkDto(Url.Link(nameof(PutMaintenanceHistory), new { id = history.MaintenanceHistoryID }), "update_history", "PUT"));
-            history.Links.Add(new LinkDto(Url.Link(nameof(DeleteMaintenanceHistory), new { id = history.MaintenanceHistoryID }), "delete_history", "DELETE"));
+            history.Links.Add(new LinkDto(Url.Link(nameof(GetMaintenanceHistory), new { id = history.LoanId }), "self", "GET"));
+            history.Links.Add(new LinkDto(Url.Link(nameof(PutMaintenanceHistory), new { id = history.LoanId }), "update_history", "PUT"));
+            history.Links.Add(new LinkDto(Url.Link(nameof(DeleteMaintenanceHistory), new { id = history.LoanId }), "delete_history", "DELETE"));
 
             return Ok(history);
         }
@@ -102,7 +102,7 @@ namespace library_system.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PutMaintenanceHistory(Guid id, HistoryDTO historyDto)
         {
-            if (id != historyDto.MaintenanceHistoryID)
+            if (id != historyDto.LoanId)
             {
                 return BadRequest();
             }
@@ -133,11 +133,11 @@ namespace library_system.Api.Controllers
         {
             var createdHistory = await _historyService.CreateHistoryAsync(historyDto);
 
-            createdHistory.Links.Add(new LinkDto(Url.Link(nameof(GetMaintenanceHistory), new { id = createdHistory.MaintenanceHistoryID }), "self", "GET"));
-            createdHistory.Links.Add(new LinkDto(Url.Link(nameof(PutMaintenanceHistory), new { id = createdHistory.MaintenanceHistoryID }), "update_history", "PUT"));
-            createdHistory.Links.Add(new LinkDto(Url.Link(nameof(DeleteMaintenanceHistory), new { id = createdHistory.MaintenanceHistoryID }), "delete_history", "DELETE"));
+            createdHistory.Links.Add(new LinkDto(Url.Link(nameof(GetMaintenanceHistory), new { id = createdHistory.LoanId }), "self", "GET"));
+            createdHistory.Links.Add(new LinkDto(Url.Link(nameof(PutMaintenanceHistory), new { id = createdHistory.LoanId }), "update_history", "PUT"));
+            createdHistory.Links.Add(new LinkDto(Url.Link(nameof(DeleteMaintenanceHistory), new { id = createdHistory.LoanId }), "delete_history", "DELETE"));
 
-            return CreatedAtAction(nameof(GetMaintenanceHistory), new { id = createdHistory.MaintenanceHistoryID }, createdHistory);
+            return CreatedAtAction(nameof(GetMaintenanceHistory), new { id = createdHistory.LoanId }, createdHistory);
         }
 
         /// <summary>

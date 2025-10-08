@@ -7,10 +7,10 @@ namespace library_system.Infrastructure.Persistence.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly ChallengeMotoConnectContext _context;
+        private readonly LibrarySystemContext _context;
         private readonly DbSet<T> _dbSet;
 
-        public Repository(ChallengeMotoConnectContext context)
+        public Repository(LibrarySystemContext context)
         {
             _context = context;
             _dbSet = context.Set<T>();

@@ -8,12 +8,12 @@ namespace library_system.Application.Services
 {
     public interface IVehicleService
     {
-        Task<IEnumerable<VehicleDTO>> GetAllVehiclesAsync();
-        Task<VehicleDTO> GetVehicleByIdAsync(Guid id);
-        Task<VehicleDTO> CreateVehicleAsync(VehicleDTO vehicleDto);
-        Task UpdateVehicleAsync(Guid id, VehicleDTO vehicleDto);
+        Task<IEnumerable<BookDTO>> GetAllVehiclesAsync();
+        Task<BookDTO> GetVehicleByIdAsync(Guid id);
+        Task<BookDTO> CreateVehicleAsync(BookDTO vehicleDto);
+        Task UpdateVehicleAsync(Guid id, BookDTO vehicleDto);
         Task DeleteVehicleAsync(Guid id);
-        Task<PagedListDto<VehicleDTO>> GetPagedVehiclesAsync(PaginationParams paginationParams);
+        Task<PagedListDto<BookDTO>> GetPagedVehiclesAsync(PaginationParams paginationParams);
     }
 }
 

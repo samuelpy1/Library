@@ -3,7 +3,7 @@ using library_system.Application.DTOs.HATEOAS;
 
 namespace library_system.Application.DTOs
 {
-    public class LoanDTO : BaseDto
+    public class HistoryDTO : BaseDto
     {
         public Guid LoanId { get; set; }
         public Guid BookId { get; set; }
@@ -13,7 +13,6 @@ namespace library_system.Application.DTOs
         public DateTime? ReturnDate { get; set; }
         public int Status { get; set; }
         public decimal? LateFee { get; set; }
-        public string Notes { get; set; }
+        public string Notes { get; set; } = string.Empty;
     }
 }
-

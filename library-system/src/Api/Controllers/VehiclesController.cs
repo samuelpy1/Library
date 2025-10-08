@@ -34,8 +34,8 @@ namespace library_system.Api.Controllers
         /// <returns>Lista paginada de motocicletas</returns>
         /// <response code="200">Retorna a lista de motocicletas com sucesso</response>
         [HttpGet(Name = nameof(GetVehicles))]
-        [ProducesResponseType(typeof(IEnumerable<VehicleDTO>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<VehicleDTO>>> GetVehicles([FromQuery] PaginationParams paginationParams)
+        [ProducesResponseType(typeof(IEnumerable<BookDTO>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<BookDTO>>> GetVehicles([FromQuery] PaginationParams paginationParams)
         {
             var pagedVehicles = await _vehicleService.GetPagedVehiclesAsync(paginationParams);
 
@@ -53,9 +53,9 @@ namespace library_system.Api.Controllers
 
             foreach (var vehicle in pagedVehicles.Items)
             {
-                vehicle.Links.Add(new LinkDto(Url.Link(nameof(GetVehicle), new { id = vehicle.VehicleId }), "self", "GET"));
-                vehicle.Links.Add(new LinkDto(Url.Link(nameof(PutVehicle), new { id = vehicle.VehicleId }), "update_vehicle", "PUT"));
-                vehicle.Links.Add(new LinkDto(Url.Link(nameof(DeleteVehicle), new { id = vehicle.VehicleId }), "delete_vehicle", "DELETE"));
+                vehicle.Links.Add(new LinkDto(Url.Link(nameof(GetVehicle), new { id = vehicle.BookId }), "self", "GET"));
+                vehicle.Links.Add(new LinkDto(Url.Link(nameof(PutVehicle), new { id = vehicle.BookId }), "update_vehicle", "PUT"));
+                vehicle.Links.Add(new LinkDto(Url.Link(nameof(DeleteVehicle), new { id = vehicle.BookId }), "delete_vehicle", "DELETE"));
             }
 
             return Ok(pagedVehicles.Items);
@@ -69,9 +69,9 @@ namespace library_system.Api.Controllers
         /// <response code="200">Motocicleta encontrada com sucesso</response>
         /// <response code="404">Motocicleta não encontrada</response>
         [HttpGet("{id:guid}", Name = nameof(GetVehicle))]
-        [ProducesResponseType(typeof(VehicleDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BookDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<VehicleDTO>> GetVehicle(Guid id)
+        public async Task<ActionResult<BookDTO>> GetVehicle(Guid id)
         {
             var vehicle = await _vehicleService.GetVehicleByIdAsync(id);
 
@@ -80,9 +80,9 @@ namespace library_system.Api.Controllers
                 return NotFound();
             }
 
-            vehicle.Links.Add(new LinkDto(Url.Link(nameof(GetVehicle), new { id = vehicle.VehicleId }), "self", "GET"));
-            vehicle.Links.Add(new LinkDto(Url.Link(nameof(PutVehicle), new { id = vehicle.VehicleId }), "update_vehicle", "PUT"));
-            vehicle.Links.Add(new LinkDto(Url.Link(nameof(DeleteVehicle), new { id = vehicle.VehicleId }), "delete_vehicle", "DELETE"));
+            vehicle.Links.Add(new LinkDto(Url.Link(nameof(GetVehicle), new { id = vehicle.BookId }), "self", "GET"));
+            vehicle.Links.Add(new LinkDto(Url.Link(nameof(PutVehicle), new { id = vehicle.BookId }), "update_vehicle", "PUT"));
+            vehicle.Links.Add(new LinkDto(Url.Link(nameof(DeleteVehicle), new { id = vehicle.BookId }), "delete_vehicle", "DELETE"));
 
             return Ok(vehicle);
         }
@@ -102,9 +102,9 @@ namespace library_system.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutVehicle(Guid id, [FromBody] VehicleDTO vehicleDto)
+        public async Task<IActionResult> PutVehicle(Guid id, [FromBody] BookDTO vehicleDto)
         {
-            if (id != vehicleDto.VehicleId)
+            if (id != vehicleDto.BookId)
             {
                 return BadRequest(new { error = "O ID na URL não corresponde ao ID do veículo no corpo da requisição." });
             }
@@ -143,19 +143,19 @@ namespace library_system.Api.Controllers
         /// <response code="201">Motocicleta criada com sucesso</response>
         /// <response code="400">Dados inválidos fornecidos</response>
         [HttpPost(Name = nameof(PostVehicle))]
-        [ProducesResponseType(typeof(VehicleDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BookDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<VehicleDTO>> PostVehicle(VehicleDTO vehicleDto)
+        public async Task<ActionResult<BookDTO>> PostVehicle(BookDTO vehicleDto)
         {
             try
             {
                 var createdVehicle = await _vehicleService.CreateVehicleAsync(vehicleDto);
 
-                createdVehicle.Links.Add(new LinkDto(Url.Link(nameof(GetVehicle), new { id = createdVehicle.VehicleId }), "self", "GET"));
-                createdVehicle.Links.Add(new LinkDto(Url.Link(nameof(PutVehicle), new { id = createdVehicle.VehicleId }), "update_vehicle", "PUT"));
-                createdVehicle.Links.Add(new LinkDto(Url.Link(nameof(DeleteVehicle), new { id = createdVehicle.VehicleId }), "delete_vehicle", "DELETE"));
+                createdVehicle.Links.Add(new LinkDto(Url.Link(nameof(GetVehicle), new { id = createdVehicle.BookId }), "self", "GET"));
+                createdVehicle.Links.Add(new LinkDto(Url.Link(nameof(PutVehicle), new { id = createdVehicle.BookId }), "update_vehicle", "PUT"));
+                createdVehicle.Links.Add(new LinkDto(Url.Link(nameof(DeleteVehicle), new { id = createdVehicle.BookId }), "delete_vehicle", "DELETE"));
 
-                return CreatedAtAction(nameof(GetVehicle), new { id = createdVehicle.VehicleId }, createdVehicle);
+                return CreatedAtAction(nameof(GetVehicle), new { id = createdVehicle.BookId }, createdVehicle);
             }
             catch (ArgumentException ex)
             {

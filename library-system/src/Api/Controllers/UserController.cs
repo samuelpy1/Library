@@ -54,9 +54,9 @@ namespace library_system.Api.Controllers
 
             foreach (var user in pagedUsers.Items)
             {
-                user.Links.Add(new LinkDto(Url.Link(nameof(GetUser), new { id = user.UserID }), "self", "GET"));
-                user.Links.Add(new LinkDto(Url.Link(nameof(PutUser), new { id = user.UserID }), "update_user", "PUT"));
-                user.Links.Add(new LinkDto(Url.Link(nameof(DeleteUser), new { id = user.UserID }), "delete_user", "DELETE"));
+                user.Links.Add(new LinkDto(Url.Link(nameof(GetUser), new { id = user.MemberId }), "self", "GET"));
+                user.Links.Add(new LinkDto(Url.Link(nameof(PutUser), new { id = user.MemberId }), "update_user", "PUT"));
+                user.Links.Add(new LinkDto(Url.Link(nameof(DeleteUser), new { id = user.MemberId }), "delete_user", "DELETE"));
             }
 
             return Ok(pagedUsers.Items);
@@ -81,9 +81,9 @@ namespace library_system.Api.Controllers
                 return NotFound();
             }
 
-            user.Links.Add(new LinkDto(Url.Link(nameof(GetUser), new { id = user.UserID }), "self", "GET"));
-            user.Links.Add(new LinkDto(Url.Link(nameof(PutUser), new { id = user.UserID }), "update_user", "PUT"));
-            user.Links.Add(new LinkDto(Url.Link(nameof(DeleteUser), new { id = user.UserID }), "delete_user", "DELETE"));
+            user.Links.Add(new LinkDto(Url.Link(nameof(GetUser), new { id = user.MemberId }), "self", "GET"));
+            user.Links.Add(new LinkDto(Url.Link(nameof(PutUser), new { id = user.MemberId }), "update_user", "PUT"));
+            user.Links.Add(new LinkDto(Url.Link(nameof(DeleteUser), new { id = user.MemberId }), "delete_user", "DELETE"));
 
             return Ok(user);
         }
@@ -103,7 +103,7 @@ namespace library_system.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PutUser(Guid id, UserDTO userDto)
         {
-            if (id != userDto.UserID)
+            if (id != userDto.MemberId)
             {
                 return BadRequest();
             }
@@ -133,12 +133,12 @@ namespace library_system.Api.Controllers
         public async Task<ActionResult<UserDTO>> PostUser(UserDTO userDto)
         {
             var createdUser = await _userService.CreateUserAsync(userDto);
-            
-            createdUser.Links.Add(new LinkDto(Url.Link(nameof(GetUser), new { id = createdUser.UserID }), "self", "GET"));
-            createdUser.Links.Add(new LinkDto(Url.Link(nameof(PutUser), new { id = createdUser.UserID }), "update_user", "PUT"));
-            createdUser.Links.Add(new LinkDto(Url.Link(nameof(DeleteUser), new { id = createdUser.UserID }), "delete_user", "DELETE"));
 
-            return CreatedAtAction(nameof(GetUser), new { id = createdUser.UserID }, createdUser);
+            createdUser.Links.Add(new LinkDto(Url.Link(nameof(GetUser), new { id = createdUser.MemberId }), "self", "GET"));
+            createdUser.Links.Add(new LinkDto(Url.Link(nameof(PutUser), new { id = createdUser.MemberId }), "update_user", "PUT"));
+            createdUser.Links.Add(new LinkDto(Url.Link(nameof(DeleteUser), new { id = createdUser.MemberId }), "delete_user", "DELETE"));
+
+            return CreatedAtAction(nameof(GetUser), new { id = createdUser.MemberId }, createdUser);
         }
 
         /// <summary>

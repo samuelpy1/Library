@@ -11,61 +11,93 @@ namespace library_system.Application.Services
 {
     public class VehicleService : IVehicleService
     {
-        private readonly IRepository<Vehicle> _vehicleRepository;
+        private readonly IRepository<Book> _vehicleRepository;
 
-        public VehicleService(IRepository<Vehicle> vehicleRepository)
+        public VehicleService(IRepository<Book> vehicleRepository)
         {
             _vehicleRepository = vehicleRepository;
         }
 
-        public async Task<IEnumerable<VehicleDTO>> GetAllVehiclesAsync()
+        public async Task<IEnumerable<BookDTO>> GetAllVehiclesAsync()
         {
             var vehicles = await _vehicleRepository.GetAllAsync();
-            return vehicles.Select(v => new VehicleDTO
+            return vehicles.Select(v => new BookDTO
             {
-                VehicleId = v.VehicleId,
-                LicensePlate = v.LicensePlate,
-                VehicleModel = v.VehicleModel.ToString()
+                BookId = v.BookId,
+                ISBN = v.ISBN,
+                Title = v.Title,
+                Author = v.Author,
+                Publisher = v.Publisher,
+                PublicationYear = v.PublicationYear,
+                Category = v.Category,
+                TotalCopies = v.TotalCopies,
+                AvailableCopies = v.AvailableCopies,
+                Status = (int)v.Status
             });
         }
 
-        public async Task<VehicleDTO> GetVehicleByIdAsync(Guid id)
+        public async Task<BookDTO> GetVehicleByIdAsync(Guid id)
         {
             var vehicle = await _vehicleRepository.GetByIdAsync(id);
             if (vehicle == null) return null;
 
-            return new VehicleDTO
+            return new BookDTO
             {
-                VehicleId = vehicle.VehicleId,
-                LicensePlate = vehicle.LicensePlate,
-                VehicleModel = vehicle.VehicleModel.ToString()
+                BookId = vehicle.BookId,
+                ISBN = vehicle.ISBN,
+                Title = vehicle.Title,
+                Author = vehicle.Author,
+                Publisher = vehicle.Publisher,
+                PublicationYear = vehicle.PublicationYear,
+                Category = vehicle.Category,
+                TotalCopies = vehicle.TotalCopies,
+                AvailableCopies = vehicle.AvailableCopies,
+                Status = (int)vehicle.Status
             };
         }
 
-        public async Task<VehicleDTO> CreateVehicleAsync(VehicleDTO vehicleDto)
+        public async Task<BookDTO> CreateVehicleAsync(BookDTO vehicleDto)
         {
-            var vehicle = new Vehicle
-            {
-                VehicleId = Guid.NewGuid(),
-                LicensePlate = vehicleDto.LicensePlate,
-                VehicleModel = (VehicleModel)Enum.Parse(typeof(VehicleModel), vehicleDto.VehicleModel)
-            };
+            var vehicle = new Book(
+                Guid.NewGuid(),
+                vehicleDto.ISBN,
+                vehicleDto.Title,
+                vehicleDto.Author,
+                vehicleDto.Publisher,
+                vehicleDto.PublicationYear,
+                vehicleDto.Category,
+                vehicleDto.TotalCopies
+            );
             await _vehicleRepository.AddAsync(vehicle);
-            return new VehicleDTO
+            return new BookDTO
             {
-                VehicleId = vehicle.VehicleId,
-                LicensePlate = vehicle.LicensePlate,
-                VehicleModel = vehicle.VehicleModel.ToString()
+                BookId = vehicle.BookId,
+                ISBN = vehicle.ISBN,
+                Title = vehicle.Title,
+                Author = vehicle.Author,
+                Publisher = vehicle.Publisher,
+                PublicationYear = vehicle.PublicationYear,
+                Category = vehicle.Category,
+                TotalCopies = vehicle.TotalCopies,
+                AvailableCopies = vehicle.AvailableCopies,
+                Status = (int)vehicle.Status
             };
         }
 
-        public async Task UpdateVehicleAsync(Guid id, VehicleDTO vehicleDto)
+        public async Task UpdateVehicleAsync(Guid id, BookDTO vehicleDto)
         {
             var vehicle = await _vehicleRepository.GetByIdAsync(id);
             if (vehicle == null) throw new KeyNotFoundException("Vehicle not found.");
 
-            vehicle.LicensePlate = vehicleDto.LicensePlate;
-            vehicle.VehicleModel = (VehicleModel)Enum.Parse(typeof(VehicleModel), vehicleDto.VehicleModel);
+            vehicle.ISBN = vehicleDto.ISBN;
+            vehicle.Title = vehicleDto.Title;
+            vehicle.Author = vehicleDto.Author;
+            vehicle.Publisher = vehicleDto.Publisher;
+            vehicle.PublicationYear = vehicleDto.PublicationYear;
+            vehicle.Category = vehicleDto.Category;
+            vehicle.TotalCopies = vehicleDto.TotalCopies;
+            vehicle.AvailableCopies = vehicleDto.AvailableCopies;
+            vehicle.Status = (BookStatus)vehicleDto.Status;
 
             await _vehicleRepository.UpdateAsync(vehicle);
         }
@@ -75,22 +107,29 @@ namespace library_system.Application.Services
             var vehicle = await _vehicleRepository.GetByIdAsync(id);
             if (vehicle == null) throw new KeyNotFoundException("Vehicle not found.");
 
-            await _vehicleRepository.DeleteAsync(vehicle.VehicleId);
+            await _vehicleRepository.DeleteAsync(vehicle.BookId);
         }
 
-        public async Task<PagedListDto<VehicleDTO>> GetPagedVehiclesAsync(PaginationParams paginationParams)
+        public async Task<PagedListDto<BookDTO>> GetPagedVehiclesAsync(PaginationParams paginationParams)
         {
             var vehicles = _vehicleRepository.GetAllAsQueryable();
-            var pagedVehicles = PagedListDto<Vehicle>.ToPagedList(vehicles, paginationParams.PageNumber, paginationParams.PageSize);
+            var pagedVehicles = PagedListDto<Book>.ToPagedList(vehicles, paginationParams.PageNumber, paginationParams.PageSize);
 
-            var vehicleDtos = pagedVehicles.Items.Select(v => new VehicleDTO
+            var vehicleDtos = pagedVehicles.Items.Select(v => new BookDTO
             {
-                VehicleId = v.VehicleId,
-                LicensePlate = v.LicensePlate,
-                VehicleModel = v.VehicleModel.ToString()
+                BookId = v.BookId,
+                ISBN = v.ISBN,
+                Title = v.Title,
+                Author = v.Author,
+                Publisher = v.Publisher,
+                PublicationYear = v.PublicationYear,
+                Category = v.Category,
+                TotalCopies = v.TotalCopies,
+                AvailableCopies = v.AvailableCopies,
+                Status = (int)v.Status
             }).ToList();
 
-            return new PagedListDto<VehicleDTO>(vehicleDtos, pagedVehicles.TotalCount, pagedVehicles.CurrentPage, pagedVehicles.PageSize);
+            return new PagedListDto<BookDTO>(vehicleDtos, pagedVehicles.TotalCount, pagedVehicles.CurrentPage, pagedVehicles.PageSize);
         }
     }
 }

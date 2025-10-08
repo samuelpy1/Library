@@ -10,8 +10,8 @@ using library_system.Infrastructure.Persistence.Context;
 
 namespace Infrastructure.Migrations
 {
-    [DbContext(typeof(ChallengeMotoConnectContext))]
-    partial class ChallengeMotoConnectContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(LibrarySystemContext))]
+    partial class LibrarySystemContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

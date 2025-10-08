@@ -11,7 +11,7 @@ using library_system.Infrastructure.Persistence.Context;
 
 namespace Infrastructure.Migrations
 {
-    [DbContext(typeof(ChallengeMotoConnectContext))]
+    [DbContext(typeof(LibrarySystemContext))]
     [Migration("20250927185142_InitialCreate")]
     partial class InitialCreate
     {
